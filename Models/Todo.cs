@@ -1,6 +1,6 @@
 namespace ToDo.Models;
 
-public class ToDo
+public class ToDoModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;

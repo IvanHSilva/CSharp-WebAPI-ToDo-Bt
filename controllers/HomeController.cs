@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using ToDo.Data;
+using ToDo.Models;
 
 namespace Todo.Controllers;
 
@@ -7,8 +9,8 @@ public class HomeController : ControllerBase
 {
 
     [HttpGet("/")]
-    public string Get()
+    public List<ToDoModel> Get([FromServices] AppDbContext context) // DI
     {
-        return "Todo Project";
+        return [.. context.ToDos];
     }
 }

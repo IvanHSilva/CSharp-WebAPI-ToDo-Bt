@@ -11,32 +11,33 @@ public class HomeController : ControllerBase
 {
 
     [HttpGet("/")]
-    public List<ToDoModel> Get([FromServices] AppDbContext context) // DI
-    {
-        return [.. context.ToDos];
-    }
+    public IActionResult Get([FromServices] AppDbContext context) // DI
+    => Ok(context.ToDos.ToList());
 
     [HttpGet("/{id:int}")]
-    public ToDoModel GetById([FromRoute] int id, [FromServices] AppDbContext context) // DI
+    public IActionResult GetById([FromRoute] int id, [FromServices] AppDbContext context) // DI
     {
-        return context.ToDos.FirstOrDefault(t => t.Id == id)!;
+        ToDoModel todo = context.ToDos.FirstOrDefault(t => t.Id == id)!;
+        if (todo == null) return NotFound();
+
+        return Ok(todo);
     }
 
     [HttpPost("/")]
-    public ToDoModel Post([FromBody] ToDoModel todo, [FromServices] AppDbContext context)
+    public IActionResult Post([FromBody] ToDoModel todo, [FromServices] AppDbContext context)
     {
         context.ToDos.Add(todo);
         context.SaveChanges();
 
-        return todo;
+        return Created($"/{todo.Id}", todo);
     }
 
     [HttpPut("/{id:int}")]
-    public ToDoModel Put([FromRoute] int id, [FromBody] ToDoModel model,
+    public IActionResult Put([FromRoute] int id, [FromBody] ToDoModel model,
     [FromServices] AppDbContext context)
     {
         ToDoModel todo = context.ToDos.FirstOrDefault(t => t.Id == id)!;
-        if (todo == null) return todo!;
+        if (todo == null) return NotFound();
 
         todo.Title = model.Title;
         todo.Done = model.Done;
@@ -44,18 +45,18 @@ public class HomeController : ControllerBase
         context.Update(todo);
         context.SaveChanges();
 
-        return todo;
+        return Ok(todo);
     }
 
     [HttpDelete("/{id:int}")]
-    public ToDoModel Delete([FromRoute] int id, [FromServices] AppDbContext context)
+    public IActionResult Delete([FromRoute] int id, [FromServices] AppDbContext context)
     {
         ToDoModel todo = context.ToDos.FirstOrDefault(t => t.Id == id)!;
-        if (todo == null) return todo!;
+        if (todo == null) return NotFound();
 
         context.Remove(todo);
         context.SaveChanges();
 
-        return todo;
+        return Ok(todo);
     }
 }
